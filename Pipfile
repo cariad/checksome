@@ -16,6 +16,7 @@ twine = "~=4.0"
 yamllint = "~=1.0"
 
 [packages]
+cline = "~=1.0"
 
 [requires]
 python_version = "3.9"

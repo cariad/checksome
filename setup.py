@@ -34,7 +34,15 @@ setup(
     author_email="cariad@cariad.earth",
     classifiers=classifiers,
     description="Generates and compares file checksums",
+    entry_points={
+        "console_scripts": [
+            "checksome=checksome.__main__:entry",
+        ],
+    },
     include_package_data=True,
+    install_requires=[
+        "cline~=1.0",
+    ],
     license="MIT",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -42,10 +50,12 @@ setup(
     packages=[
         "checksome",
         "checksome.algorithms",
+        "checksome.cli",
     ],
     package_data={
         "checksome": ["py.typed"],
         "checksome.algorithms": ["py.typed"],
+        "checksome.cli": ["py.typed"],
     },
     python_requires=">=3.9",
     url="https://github.com/cariad/checksome",
