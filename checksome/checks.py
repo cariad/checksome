@@ -34,13 +34,13 @@ def checksum_reader(
     algorithm: Type[Algorithm],
 ) -> Iterator[ChecksumReader]:
     """
-    Creates and returns a checksum reader for a file.
+    Creates and returns a `ChecksumReader` for a file.
 
     This should be used as a context manager to ensure the file is properly
     closed. For example:
 
     ```python
-    with checksum_file("clowns.jpg", SHA256) as file:
+    with checksum_reader("clowns.jpg", SHA256) as file:
         file.checksum(...)
     ```
     """

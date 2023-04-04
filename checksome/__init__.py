@@ -60,7 +60,7 @@ cs = checksum("clowns.jpg", SHA256, offset=100, length=2000)
 # byte of "clowns.jpg"
 ```
 
-To check if a file has a given checksum, call `has_checksum()`
+To check if a file has a given checksum, call `has_checksum()`.
 
 ```python
 from checksome import has_checksum, SHA256
