@@ -1,14 +1,14 @@
 from io import BufferedReader
-from typing import Optional, Union
+from typing import Optional, Type, Union
 
 from checksome.algorithms import Algorithm
 from checksome.exceptions import UnexpectedEndOfBuffer
 from checksome.logging import logger
 
 
-class BufferChecksum:
+class ChecksumReader:
     """
-    Buffer checksum reader.
+    Generates and compares `algorithm` checksums for the content of `buffer`.
 
     `chunk_len` prescribes the maximum number of bytes to read at a time.
     Defaults to 64 kilobytes.
@@ -16,11 +16,11 @@ class BufferChecksum:
 
     def __init__(
         self,
-        algorithm: Algorithm,
+        algorithm: Type[Algorithm],
         buffer: BufferedReader,
         chunk_len: int = 65_536,
     ) -> None:
-        self._algo = algorithm
+        self._algorithm = algorithm
         self._buffer = buffer
         self._chunk_len = chunk_len
 
@@ -41,7 +41,7 @@ class BufferChecksum:
         read to the end.
         """
 
-        wip = self._algo.new()
+        hash = self._algorithm()
         remaining = length
 
         offset = 0 if offset is None else offset
@@ -61,12 +61,12 @@ class BufferChecksum:
             if end and length is not None:
                 raise UnexpectedEndOfBuffer(offset, length)
 
-            wip.update(data)
+            hash.update(data)
 
             if end:
                 break
 
-        return wip.digest()
+        return hash.digest()
 
     def has_checksum(
         self,

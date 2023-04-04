@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
 
-class Hash(ABC):
+class Algorithm(ABC):
     """
-    Hash.
+    Abstract implementation of a hashing algorithm.
     """
 
     @abstractmethod
@@ -16,16 +16,4 @@ class Hash(ABC):
     def update(self, data: bytes) -> None:
         """
         Adds bytes to the hash.
-        """
-
-
-class Algorithm(ABC):
-    """
-    Hashing algorithm.
-    """
-
-    @abstractmethod
-    def new(self) -> Hash:
-        """
-        Creates and returns a new empty hash.
         """
