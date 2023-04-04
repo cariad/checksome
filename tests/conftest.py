@@ -15,7 +15,7 @@ def data() -> Path:
 
 
 @fixture
-def load_ranges(
+def load_checksums(
     data: Path,
 ) -> Callable[[str], Iterable[Tuple[int, int, bytes]]]:
     def load(filename: str) -> Iterable[Tuple[int, int, bytes]]:

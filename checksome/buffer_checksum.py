@@ -1,4 +1,5 @@
 from io import BufferedReader
+from typing import Optional, Union
 
 from checksome.algorithms import Algorithm
 from checksome.exceptions import UnexpectedEndOfBuffer
@@ -23,41 +24,82 @@ class BufferChecksum:
         self._buffer = buffer
         self._chunk_len = chunk_len
 
-    def checksum(self, offset: int, length: int) -> bytes:
+    def checksum(
+        self,
+        offset: Optional[int] = None,
+        length: Optional[int] = None,
+    ) -> bytes:
         """
-        Gets the checksum of the bytes from `offset` for `length`.
+        Gets the checksum of the buffer.
+
+        If `offset` is set then the checksum will be calculated only for bytes
+        from that offset. If `offset` is omitted then the buffer will be read
+        from the start.
+
+        If `length` is set then the checksum will be calculated only for that
+        given length of bytes. If `length` is omitted then the buffer will be
+        read to the end.
         """
 
         wip = self._algo.new()
         remaining = length
 
+        offset = 0 if offset is None else offset
+
         self._buffer.seek(offset)
 
-        while remaining > 0:
-            read_len = min(length, self._chunk_len)
-            remaining -= read_len
-            data = self._buffer.read(read_len)
+        while remaining is None or remaining > 0:
+            if remaining is None:
+                read_len = self._chunk_len
+            else:
+                read_len = min(remaining, self._chunk_len)
+                remaining -= read_len
 
-            if len(data) < read_len:
+            data = self._buffer.read(read_len)
+            end = len(data) < read_len
+
+            if end and length is not None:
                 raise UnexpectedEndOfBuffer(offset, length)
 
             wip.update(data)
 
+            if end:
+                break
+
         return wip.digest()
 
-    def has_checksum(self, offset: int, length: int, expect: bytes) -> bool:
+    def has_checksum(
+        self,
+        expect: Union[bytes, str],
+        offset: Optional[int] = None,
+        length: Optional[int] = None,
+    ) -> bool:
         """
-        Checks if the bytes from `offset` for `length` have the expected
-        checksum.
+        Checks if the buffer has the expected checksum.
+
+        `expect` can be the expected checksum as either bytes or a hexadecimal
+        string.
+
+        If `offset` is set then the checksum will be calculated only for bytes
+        from that offset. If `offset` is omitted then the buffer will be read
+        from the start.
+
+        If `length` is set then the checksum will be calculated only for that
+        given length of bytes. If `length` is omitted then the buffer will be
+        read to the end.
         """
 
-        actual = self.checksum(offset, length)
+        actual = self.checksum(offset=offset, length=length)
+
+        expect = bytes.fromhex(expect) if isinstance(expect, str) else expect
+        log_offset = 0 if offset is None else offset
+        log_end = "end" if length is None else log_offset + length
 
         if actual == expect:
             logger.debug(
                 "Bytes %s-%s have expected checksum %s",
-                offset,
-                offset + length,
+                log_offset,
+                log_end,
                 expect.hex(),
             )
 
@@ -66,8 +108,8 @@ class BufferChecksum:
         logger.debug(
             "Expected checksum %s for bytes %s-%s but discovered %s",
             expect.hex(),
-            offset,
-            offset + length,
+            log_offset,
+            log_end,
             actual.hex(),
         )
 
