@@ -41,9 +41,11 @@ setup(
     name="checksome",
     packages=[
         "checksome",
+        "checksome.algorithms",
     ],
     package_data={
         "checksome": ["py.typed"],
+        "checksome.algorithms": ["py.typed"],
     },
     python_requires=">=3.9",
     url="https://github.com/cariad/checksome",
